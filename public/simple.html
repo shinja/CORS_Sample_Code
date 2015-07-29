@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>CORS with node server</title>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js" charset="utf-8"></script>
+    <style media="screen">
+    ul li {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    </style>
+    <script type="text/javascript">
+
+    $(function () {
+
+        var $li;
+
+        $('#home .ajax').click(function () {
+            var self = $(this);
+            $li = self;
+
+            $.ajax({
+                url: self.data('url'),
+                dataType: "jsonp",
+                success: function(data) {
+                    console.log(data);
+                    $li.after('<div>' + JSON.stringify(data) + '</div>');
+                }
+            });
+        });
+
+        $('#home li:not(.ajax)').click(function () {
+            var self = $(this);
+            $li = self;
+            var method = self.data('method') || self.text();
+            var headers = self.data('headers') && JSON.parse(self.data('headers').replace(/'/g, "\""));
+            makeRequest(method, self.data('url'), headers, self.data('credentials'));
+        });
+
+        var ready = function () {
+
+            if (this.readyState === this.DONE) {
+                if (this.status === 200) {
+
+                    if ($li.text() === "HEAD") {
+                        $li.after('<div>HEAD: ' + this.getAllResponseHeaders() + '</div>');
+                        console.log(this.getAllResponseHeaders());
+                    }
+                    $li.after('<div>' + this.responseText + '</div>');
+                } else {
+                    alert('There was a problem with the request.');
+                }
+            }
+        };
+
+        function makeRequest(method, url, headers) {
+
+            console.log(method, '==>', url);
+            var xhr;
+
+            if (window.XMLHttpRequest) { // Mozilla, Safari, ...
+                xhr = new XMLHttpRequest();
+            } else if (window.ActiveXObject) { // IE
+                try {
+                    xhr = new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    try {
+                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                    } catch (e) {}
+                }
+            }
+
+            if (!xhr) {
+                alert('Giving up :( Cannot create an XMLHTTP instance');
+                return false;
+            }
+            xhr.onreadystatechange = ready;
+            xhr.onerror = function(e) {
+                console.log("error", e);
+            };
+
+            xhr.open(method, url, true);
+            xhr.withCredentials = !!arguments[3];//crenentials
+            for (var x in headers) {
+                console.log("setRequestHeader", x, headers[x]);
+                xhr.setRequestHeader(x, headers[x]);
+            };
+            xhr.send();
+        }
+    });
+
+    </script>
+</head>
+<body>
+
+    <div id="home">
+        <h3>*Please using http://127.0.0.1 to get this page.</h3>
+        <h2>Simple Requests</h2>
+        <ul>
+            <li data-url="http://localhost:8081/cors_not_work" data-method="GET">GET (not workable)</li>
+            <li data-url="http://localhost:8081/">GET</li>
+            <li data-url="http://localhost:8081/">HEAD</li>
+            <li data-url="http://localhost:8081/">POST</li>
+        </ul>
+        <h2>Preflight Requests(OPTIONS)</h2>
+        <ul>
+            <li data-url="http://localhost:8081/" data-method="GET" data-headers="{'X-OTHER-HEADER': 'pingpong'}">GET - custom header(not workable)</li>
+            <li data-url="http://localhost:8081/" data-method="GET" data-headers="{'X-PINGOTHER': 'pingpong'}">GET - custom header</li>
+        </ul>
+        <h2>Request with credentials</h2>
+        <ul>
+            <li data-url="http://localhost:8081/" data-method="POST" data-credentials="true">POST - with creentials</li>
+        </ul>
+        <h2>JSONP</h2>
+        <ul>
+            <li class="ajax" data-url="http://localhost:8081/cors_not_work" >JSONP - cors_not_work url</li>
+        </ul>
+    </div>
+
+
+    <div>
+        <h2>
+            References:
+        </h2>
+        <ul>
+            <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS">https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS</a> </li>
+        </ul>
+    </div>
+</body>
+</html>

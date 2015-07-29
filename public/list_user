@@ -1,0 +1,4 @@
+static list user
+
+if app.use(express.static('public')) is put before express router,
+user will download this file but route into /list_user
