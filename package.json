@@ -1,15 +1,23 @@
 {
-  "name": "CORS sample server",
+  "name": "cors-sample-code",
   "version": "1.0.0",
-  "description": "A node server for CORS testing.",
-  "main": "index.js",
-  "dependencies": {
-    "express": "^4.13.1"
-  },
-  "devDependencies": {},
+  "description": "A sample code for explain CORS issue.",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shinja/CORS_Sample_Code.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shinja/CORS_Sample_Code/issues"
+  },
+  "homepage": "https://github.com/shinja/CORS_Sample_Code#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
 }
